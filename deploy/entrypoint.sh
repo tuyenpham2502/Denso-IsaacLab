@@ -23,14 +23,11 @@ case "$mode" in
             --task galileo_g1_locomanip_pick_and_place \
             --arena_teleop_device openxr "$@"
         ;;
-    workbench)
-        exec /isaac-sim/python.sh -m isaaclab_workbench.run "$@"
-        ;;
     shell)
         exec /bin/bash "$@"
         ;;
     *)
-        printf 'Unknown mode: %s. Use smoke, teleop, workbench, or shell.\n' "$mode" >&2
+        printf 'Unknown mode: %s. Use smoke, teleop, or shell.\n' "$mode" >&2
         exit 2
         ;;
 esac

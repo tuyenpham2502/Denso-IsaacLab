@@ -30,10 +30,9 @@ docker build --platform linux/amd64 --target dev \
     -f "$upstream_dir/docker/Dockerfile.isaaclab_arena" \
     -t "$ARENA_BASE_IMAGE" "$upstream_dir"
 
-# Package committed application source; never silently publish a dirty XR prototype.
+# Package only the basic Arena launcher; no custom scenes or application code.
 denso_commit="$(git -C "$repo_dir" rev-parse HEAD)"
 context_dir="$(mktemp -d "$build_dir/app.XXXXXX")"
-git -C "$repo_dir" archive "$denso_commit" isaaclab_workbench | tar -x -C "$context_dir"
 cp "$deploy_dir/Dockerfile" "$deploy_dir/entrypoint.sh" "$context_dir/"
 docker build --platform linux/amd64 \
     --build-arg "ARENA_BASE_IMAGE=$ARENA_BASE_IMAGE" \

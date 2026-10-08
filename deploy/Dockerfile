@@ -7,12 +7,10 @@ ARG ARENA_COMMIT=unknown
 LABEL org.opencontainers.image.source="https://github.com/tuyenpham2502/Denso-IsaacLab" \
       org.opencontainers.image.revision="${DENSO_COMMIT}" \
       io.denso.arena.revision="${ARENA_COMMIT}"
-WORKDIR /opt/denso
-COPY isaaclab_workbench /opt/denso/isaaclab_workbench
+WORKDIR /workspaces/isaaclab_arena
 COPY entrypoint.sh /opt/denso/entrypoint.sh
 RUN chmod 755 /opt/denso/entrypoint.sh
-ENV PYTHONPATH=/opt/denso \
-    OMNI_KIT_ALLOW_ROOT=1 \
+ENV OMNI_KIT_ALLOW_ROOT=1 \
     NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics,video,display
 # Replace the upstream developer entrypoint (interactive user provisioning).
 ENTRYPOINT ["/opt/denso/entrypoint.sh"]

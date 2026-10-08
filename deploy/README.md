@@ -1,7 +1,8 @@
 # DENSO Arena Docker deployment
 
-This packages the official Arena Docker environment and the committed DENSO
-workbench source. Build once on Linux x86_64, test on an NVIDIA GPU VM, push
+This packages the basic official Arena Docker environment and a launcher.
+No custom DENSO workbench or application source is included in the image.
+Build once on Linux x86_64, test on an NVIDIA GPU VM, push
 the image to a registry, and pull it on subsequent VMs.
 
 Status: deployment files only. The image has not yet been built, published,
@@ -13,13 +14,10 @@ running Docker engine. A successful Compose validation is not a runtime test.
 - Arena: `1cfc849b2172d040e2e5fce52322678f4f199387` from `release/0.3.1`.
 - Isaac Lab: the submodule revision recorded by that Arena commit.
 - Isaac Sim: `6.1.0`, selected by the upstream Dockerfile.
-- DENSO source: `isaaclab_workbench` from the repository's committed HEAD.
-  Uncommitted workbench changes are deliberately not included by `build.sh`.
 - `smoke`: a short headless Arena cube task, exits after 20 steps.
 - `teleop`: Arena's G1 Galileo pick-and-place task with OpenXR/CloudXR, one
   environment, CPU physics as in the upstream teleoperation example.
-- `workbench`: the existing standalone DENSO workbench prototype. It is not
-  yet converted into an Arena environment or combined with the G1 task.
+- `shell`: open a shell to inspect the base environment.
 
 The build uses the upstream `dev` Docker target and replaces its interactive
 user-creation entrypoint with a mode-selecting entrypoint. It does not mount
@@ -151,17 +149,6 @@ are bind-mounted under `DENSO_DATA_DIR`. Container recreation preserves them.
 Deleting the VM's disk does not: use a persistent disk or external backup when
 moving between rental VMs. Assets may still download on first launch; the
 image does not bundle every remote NVIDIA asset.
-
-To run the standalone workbench instead, stop teleop and run:
-
-```bash
-docker compose down
-docker compose run --rm --no-deps arena workbench
-```
-
-This runs the committed prototype with its default visualizer. Do not assume
-it opens a remote UI; follow the workbench documentation for the exact source
-version packaged by the image.
 
 ## References
 
