@@ -1,0 +1,4 @@
+# Send only the launcher and Dockerfile, never .env, cached builds or secrets.
+**
+!Dockerfile
+!entrypoint.sh

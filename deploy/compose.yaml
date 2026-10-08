@@ -1,61 +1,14 @@
 name: denso-arena
 services:
-  # Pull-only basic setup. This official image already contains Isaac Sim.
-  lab-init:
-    image: &lab-image ${ISAACLAB_IMAGE:-nvcr.io/nvidia/isaac-lab:3.0.0-rc1@sha256:1e795d3f10b50e97f93141a8eb1fa4d2c90a192c226a1bceecc5338ca87652f3}
-    platform: linux/amd64
-    user: "0:0"
-    entrypoint: [/bin/bash, -c]
-    command:
-      - |
-        set -eu
-        for dir in cache config cloudxr kit-cache ov-data logs compute-cache assets data data/datasets data/models data/eval; do
-          install -d -o 1000 -g 1000 -m 0755 "/state/$$dir"
-        done
-    volumes:
-      - ${DENSO_DATA_DIR:-/srv/denso}/lab:/state
-    restart: "no"
-  lab:
-    image: *lab-image
-    platform: linux/amd64
-    user: "1000:1000"
-    working_dir: /workspace/isaaclab
-    entrypoint: [/bin/bash, /opt/denso/lab-entrypoint.sh]
-    depends_on:
-      lab-init:
-        condition: service_completed_successfully
-    network_mode: host
-    ipc: host
-    init: true
-    restart: unless-stopped
-    environment:
-      ACCEPT_EULA: ${ACCEPT_EULA:-N}
-      NVIDIA_DRIVER_CAPABILITIES: compute,utility,graphics,video,display
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-    volumes:
-      - ./lab-entrypoint.sh:/opt/denso/lab-entrypoint.sh:ro
-      - ${DENSO_DATA_DIR:-/srv/denso}/lab/cache:/root/.cache
-      - ${DENSO_DATA_DIR:-/srv/denso}/lab/config:/root/.config
-      - ${DENSO_DATA_DIR:-/srv/denso}/lab/cloudxr:/root/.cloudxr
-      - ${DENSO_DATA_DIR:-/srv/denso}/lab/kit-cache:/isaac-sim/kit/cache
-      - ${DENSO_DATA_DIR:-/srv/denso}/lab/ov-data:/root/.local/share/ov/data
-      - ${DENSO_DATA_DIR:-/srv/denso}/lab/logs:/root/.nvidia-omniverse/logs
-      - ${DENSO_DATA_DIR:-/srv/denso}/lab/compute-cache:/root/.nv/ComputeCache
-      - ${DENSO_DATA_DIR:-/srv/denso}/lab/assets:/tmp/https
-      - ${DENSO_DATA_DIR:-/srv/denso}/lab/data:/data
   arena:
-    # Optional: this combined Arena image must still be built/published first.
-    profiles: [arena]
     image: ${DENSO_IMAGE:-denso-arena:local}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DENSO_COMMIT: ${DENSO_COMMIT:-unknown}
     platform: linux/amd64
-    command: [teleop]
-    # Linux GPU VM. CloudXR signaling/media bind directly to host ports.
+    command: ["${ARENA_MODE:-idle}"]
     network_mode: host
     ipc: host
     init: true
@@ -82,3 +35,6 @@ services:
       - ${DENSO_DATA_DIR:-/srv/denso}/cloudxr:/root/.cloudxr
       - ${DENSO_DATA_DIR:-/srv/denso}/asset-cache:/tmp/https
       - ${DENSO_DATA_DIR:-/srv/denso}/logs:/root/.nvidia-omniverse/logs
+      - ${DENSO_DATA_DIR:-/srv/denso}/kit-cache:/isaac-sim/kit/cache
+      - ${DENSO_DATA_DIR:-/srv/denso}/ov-data:/root/.local/share/ov/data
+      - ${DENSO_DATA_DIR:-/srv/denso}/compute-cache:/root/.nv/ComputeCache

@@ -9,9 +9,16 @@ export OMNI_KIT_ACCEPT_EULA=YES
 ldconfig
 arena_dir=/workspaces/isaaclab_arena
 cd "$arena_dir"
-mode="${1:-smoke}"
+mode="${1:-idle}"
 if (( $# )); then shift; fi
 case "$mode" in
+    idle)
+        printf '%s\n' 'Isaac Sim + Isaac Lab + Arena environment ready. Use check, smoke, teleop, or shell.'
+        exec sleep infinity
+        ;;
+    check)
+        exec /isaac-sim/python.sh -c "import importlib.metadata as m; [print(n, m.version(n)) for n in ('isaacsim', 'isaaclab', 'isaaclab_arena', 'isaacteleop')]"
+        ;;
     smoke)
         exec /isaac-sim/python.sh isaaclab_arena/evaluation/policy_runner.py \
             --policy_type zero_action --num_steps 20 "$@" cube_goal_pose
@@ -27,7 +34,7 @@ case "$mode" in
         exec /bin/bash "$@"
         ;;
     *)
-        printf 'Unknown mode: %s. Use smoke, teleop, or shell.\n' "$mode" >&2
+        printf 'Unknown mode: %s. Use idle, check, smoke, teleop, or shell.\n' "$mode" >&2
         exit 2
         ;;
 esac
