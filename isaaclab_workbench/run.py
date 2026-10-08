@@ -23,12 +23,13 @@ def main() -> None:
 
     import isaaclab.sim as sim_utils
 
-    from isaaclab.scene import InteractiveScene
-
-    from .scene import make_scene_cfg
-
     sim_cfg = sim_utils.SimulationCfg(dt=0.01, device=args.device)
     with launch_simulation(sim_cfg, args):
+        # Scene/assets import USD (pxr), which must wait until Kit has started.
+        from isaaclab.scene import InteractiveScene
+
+        from .scene import make_scene_cfg
+
         context = sim_utils.SimulationContext(sim_cfg)
         context.set_camera_view([2.0, 1.7, 1.5], [0.0, 0.0, spec.height / 2])
 
