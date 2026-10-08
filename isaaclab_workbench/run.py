@@ -23,24 +23,23 @@ def main() -> None:
 
     import isaaclab.sim as sim_utils
 
-    from .scene import spawn_workbench
+    from isaaclab.scene import InteractiveScene
+
+    from .scene import make_scene_cfg
 
     sim_cfg = sim_utils.SimulationCfg(dt=0.01, device=args.device)
     with launch_simulation(sim_cfg, args):
         context = sim_utils.SimulationContext(sim_cfg)
         context.set_camera_view([2.0, 1.7, 1.5], [0.0, 0.0, spec.height / 2])
 
-        ground = sim_utils.GroundPlaneCfg()
-        ground.func("/World/Ground", ground)
-        light = sim_utils.DomeLightCfg(intensity=3000.0)
-        light.func("/World/Light", light)
-        spawn_workbench(spec, test_cube=not args.no_test_cube)
+        scene = InteractiveScene(make_scene_cfg(spec, test_cube=not args.no_test_cube))
 
         context.reset()
         print(f"Workbench ready: {spec.width:.2f} x {spec.depth:.2f} x {spec.height:.2f} m")
         print("Expected: the red test cube falls and stays on the tabletop.")
         while context.is_running():
             context.step()
+            scene.update(sim_cfg.dt)
 
 
 if __name__ == "__main__":

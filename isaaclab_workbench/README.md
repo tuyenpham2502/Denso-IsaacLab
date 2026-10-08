@@ -33,7 +33,9 @@ workbench. Those are separate milestones. If the cube falls through the top,
 capture the VM log and the Viser view before changing the scene.
 
 The geometry and poses are defined in `geometry.py`; the reusable spawn
-function is in `scene.py`. Source patterns follow Isaac Lab's official
+configuration is in `scene.py`. The scene uses `InteractiveSceneCfg` so
+visualizers can discover its assets through Isaac Lab's scene/clone plan.
+Source patterns follow Isaac Lab's official
 [empty scene](https://isaac-sim.github.io/IsaacLab/develop/source/how-to/create_empty.html)
-and [spawning prims](https://isaac-sim.github.io/IsaacLab/develop/source/how-to/spawn_prims.html)
+and [interactive scene](https://isaac-sim.github.io/IsaacLab/develop/source/how-to/create_scene.html)
 guides.
