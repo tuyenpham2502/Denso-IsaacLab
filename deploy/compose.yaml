@@ -1,0 +1,33 @@
+name: denso-arena
+services:
+  arena:
+    image: ${DENSO_IMAGE:?Set DENSO_IMAGE in deploy/.env}
+    platform: linux/amd64
+    command: [teleop]
+    # Linux GPU VM. CloudXR signaling/media bind directly to host ports.
+    network_mode: host
+    ipc: host
+    init: true
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    stop_grace_period: 30s
+    environment:
+      ACCEPT_EULA: ${ACCEPT_EULA:-N}
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility,graphics,video,display
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - ${DENSO_DATA_DIR:-/srv/denso}/datasets:/datasets
+      - ${DENSO_DATA_DIR:-/srv/denso}/models:/models
+      - ${DENSO_DATA_DIR:-/srv/denso}/eval:/eval
+      - ${DENSO_DATA_DIR:-/srv/denso}/cache:/root/.cache
+      - ${DENSO_DATA_DIR:-/srv/denso}/config:/root/.config
+      - ${DENSO_DATA_DIR:-/srv/denso}/cloudxr:/root/.cloudxr
+      - ${DENSO_DATA_DIR:-/srv/denso}/asset-cache:/tmp/https
+      - ${DENSO_DATA_DIR:-/srv/denso}/logs:/root/.nvidia-omniverse/logs
